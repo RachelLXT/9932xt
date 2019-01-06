@@ -28,14 +28,13 @@ public class MergeFiles2 {
 	private static SmallHeap heap = new SmallHeap(101);
 	/**
 	 * 
-	 * file -> file pointer
+	 * file -> fileReader
 	 **/
 	private static HashMap<File, BufferedReader> readerMap = new HashMap<>();
 
 	/**
-	 * 已读完的文件个数
+	 * 每个文件的行数
 	 */
-	private static int emptyFiles = 0;
 	private static int fileLine = 100000;
 
 	/**
@@ -137,13 +136,13 @@ public class MergeFiles2 {
 	 * @throws FileNotFoundException
 	 */
 	public static void initHeap(File bigFile) throws FileNotFoundException {
-		for (int i = 0; i < fileList.size(); i++) {
-			BufferedReader reader = readerMap.get(fileList.get(i));
+		for (File file:fileList) {
+			BufferedReader reader = readerMap.get(file);
 			String word;
 			try {
 				word = reader.readLine();
 				if (word != null) {
-					heap.insert(new Node(word, fileList.get(i)));
+					heap.insert(new Node(word, file));
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -160,13 +159,12 @@ public class MergeFiles2 {
 		try (PrintWriter pw = new PrintWriter(new FileOutputStream(bigFile))) {
 			while (heap.getCount() > 0) {
 				Node minNode = heap.deleteFirst();
-				pw.write(minNode.getWord() + " " + minNode.getFile() + "\r\n");
+				pw.write(minNode.getWord() + "\r\n");
 				File file = minNode.getFile();
 				BufferedReader reader = readerMap.get(file);
 				String word = reader.readLine();
 				if (word != null && word != "\r\n") {
-					Node node = null;
-					node = new Node(word, file);
+					Node node = new Node(word, file);
 					heap.insert(node);
 				}
 			}
@@ -178,10 +176,13 @@ public class MergeFiles2 {
 
 	public static void main(String[] args) throws IOException {
 		long start = System.currentTimeMillis();
+
+		// 初始化小文件和大文件
 		String path = "D:\\data\\mergeFileData";
 		create(path);
 		init(new File(path));
 		File bigFile = createBigFile();
+		// 移动数据
 		initHeap(bigFile);
 		move(bigFile);
 		long end = System.currentTimeMillis();
