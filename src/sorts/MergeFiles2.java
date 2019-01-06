@@ -1,4 +1,4 @@
-package sort;
+package sorts;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,6 +27,7 @@ public class MergeFiles2 {
 	 **/
 	private static SmallHeap heap = new SmallHeap(101);
 	/**
+	 * 
 	 * file -> file pointer
 	 **/
 	private static HashMap<File, BufferedReader> readerMap = new HashMap<>();
@@ -35,7 +36,7 @@ public class MergeFiles2 {
 	 * 已读完的文件个数
 	 */
 	private static int emptyFiles = 0;
-	private static int fileLine = 100;
+	private static int fileLine = 100000;
 
 	/**
 	 * 创建小文件(如果存在，将其删除）并写入内容
@@ -54,18 +55,17 @@ public class MergeFiles2 {
 				if (!f.exists()) {
 					f.createNewFile();
 					writeFileContent(f.getAbsolutePath(), i);
+				} else {
+					f.delete();
+					f.createNewFile();
+					writeFileContent(f.getAbsolutePath(), i);
 				}
-//				else {
-//					f.delete();
-//					f.createNewFile();
-//					writeFileContent(f.getAbsolutePath(), i);
-//				}
 			}
 		}
 	}
 
 	/**
-	 * 写入内容，每行相差100
+	 * 写入内容，每行相差<!--fileLine-->
 	 *
 	 * @param fileName
 	 * @param i
@@ -137,13 +137,13 @@ public class MergeFiles2 {
 	 * @throws FileNotFoundException
 	 */
 	public static void initHeap(File bigFile) throws FileNotFoundException {
-		for (int i = 1;i<fileList.size();i++) {
+		for (int i = 0; i < fileList.size(); i++) {
 			BufferedReader reader = readerMap.get(fileList.get(i));
 			String word;
 			try {
 				word = reader.readLine();
 				if (word != null) {
-					heap.insert(new Node(word));
+					heap.insert(new Node(word, fileList.get(i)));
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -158,42 +158,17 @@ public class MergeFiles2 {
 	 */
 	public static void move(File bigFile) {
 		try (PrintWriter pw = new PrintWriter(new FileOutputStream(bigFile))) {
-			while (emptyFiles < 100) {
-				for (File file : fileList) {
-					BufferedReader reader = readerMap.get(file);
-					String word = reader.readLine();
-					if (word != null && word != "\r\n") {
-						Node node = new Node(word);
-						heap.insert(node);
-						Node minNode = heap.deleteFirst();
-						if (node.getWord().equals("3002")) {
-							System.out.println(file.getName());
-						}
-						pw.write(minNode.getWord() + "\r\n");
-						// 如果对顶元素来自于file文件中读取的元素，重复读取
-						// TODO 这里不支持有重复元素
-						while (minNode.getFlag() == node.getFlag()) {
-							System.out.println(minNode);
-							System.out.println(file.getName());
-							word = reader.readLine();
-							if (word != null && word != "\r\n") {
-								node = new Node(word);
-								heap.insert(node);
-								minNode = heap.deleteFirst();
-								pw.write(minNode.getWord() + "\r\n");
-							} else {
-								emptyFiles++;
-								break;
-							}
-						}
-					} else {
-						emptyFiles++;
-					}
-				}
-			}
-			heap.print();
 			while (heap.getCount() > 0) {
-				pw.write(heap.deleteFirst().getWord() + "\r\n");
+				Node minNode = heap.deleteFirst();
+				pw.write(minNode.getWord() + " " + minNode.getFile() + "\r\n");
+				File file = minNode.getFile();
+				BufferedReader reader = readerMap.get(file);
+				String word = reader.readLine();
+				if (word != null && word != "\r\n") {
+					Node node = null;
+					node = new Node(word, file);
+					heap.insert(node);
+				}
 			}
 			heap.print();
 		} catch (IOException e) {

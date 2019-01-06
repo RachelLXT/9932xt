@@ -1,4 +1,4 @@
-package stack;
+package stacks;
 
 /***
  * 用栈实现队列

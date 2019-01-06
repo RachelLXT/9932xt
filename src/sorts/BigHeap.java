@@ -1,26 +1,26 @@
-package sort;
+package sorts;
 
 /***
  * 数据结构 ：堆;数组第一个元素不存储数据 堆中的元素个数：count; count = arr.length-1
- * 
+ *
  * @author admin
  *
  */
-public class Heap {
-	private int[] arr;
+public class BigHeap {
+	private String[] arr;
 	private int count;
 
-	public Heap(int size) {
-		this.arr = new int[size];
+	public BigHeap(int size) {
+		this.arr = new String[size];
 		this.count = 0;
 	}
 
 	/**
 	 * 堆排
-	 * 
+	 *
 	 * @param arr
 	 */
-	public static void heapSort(int[] arr) {
+	public static void heapSort(String[] arr) {
 		buildHeap(arr, arr.length - 1);
 		for (int i = arr.length - 1; i > 1; i--) {
 			swap(arr, 1, i);
@@ -30,11 +30,11 @@ public class Heap {
 
 	/**
 	 * 建堆
-	 * 
+	 *
 	 * @param arr
 	 * @param n
 	 */
-	public static void buildHeap(int[] arr, int n) {
+	public static void buildHeap(String[] arr, int n) {
 		for (int i = n / 2; i > 0; i--) {
 			heapify(arr, n, i);
 		}
@@ -42,18 +42,18 @@ public class Heap {
 
 	/**
 	 * 堆化（从上往下）
-	 * 
+	 *
 	 * @param arr
 	 * @param n
 	 * @param i
 	 */
-	public static void heapify(int[] arr, int n, int i) {
+	public static void heapify(String[] arr, int n, int i) {
 		while (true) {
 			int maxPos = i;
-			if (i * 2 <= n && arr[i] < arr[i * 2]) {
+			if (i * 2 <= n && arr[i].compareTo(arr[i * 2]) < 0) {
 				maxPos = i * 2;
 			}
-			if (i * 2 + 1 <= n && arr[maxPos] < arr[i * 2 + 1]) {
+			if (i * 2 + 1 <= n && arr[maxPos].compareTo(arr[i * 2 + 1]) < 0) {
 				maxPos = i * 2 + 1;
 			}
 			if (maxPos == i) {
@@ -66,10 +66,10 @@ public class Heap {
 
 	/**
 	 * 插入
-	 * 
+	 *
 	 * @param value
 	 */
-	public void insert(int value) {
+	public void insert(String value) {
 		if (count == 0) {
 			arr[++count] = value;
 			return;
@@ -79,7 +79,7 @@ public class Heap {
 		}
 		int n = ++count;
 		arr[n] = value;
-		while (n / 2 > 0 && arr[n / 2] < arr[n]) {
+		while (n / 2 > 0 && arr[n / 2].compareTo(arr[n]) < 0) {
 			swap(arr, n / 2, n);
 			n = n / 2;
 		}
@@ -93,25 +93,25 @@ public class Heap {
 			throw new Error("array is empty");
 		}
 		arr[1] = arr[count];
-		arr[count] = 0;
+		arr[count] = "";
 		count--;
 		heapify(arr, count, 1);
 	}
 
-	public static void swap(int[] arr, int n, int m) {
-		int tmp = arr[n];
+	public static void swap(String[] arr, int n, int m) {
+		String tmp = arr[n];
 		arr[n] = arr[m];
 		arr[m] = tmp;
 	}
 
 	public static void main(String[] args) {
-		Heap heap = new Heap(15);
-		for (int i = 0; i < 10; i++) {
-			heap.insert(i);
+		BigHeap heap = new BigHeap(15);
+		for (int i = 1; i < 10; i++) {
+			heap.insert(i + "");
 		}
 		heap.print();
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 9; i++) {
 			heap.deleteFirst();
 			heap.print();
 		}
@@ -124,7 +124,7 @@ public class Heap {
 	}
 
 	public void print() {
-		for (int i : arr) {
+		for (String i : arr) {
 			System.out.print(i + "  ");
 		}
 		System.out.println(count);
